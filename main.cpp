@@ -69,9 +69,11 @@ int findMinIndex(double list[],int size){
 
 	
 }
+/*
 double findMaxTime(double list[],int size){
 	return list[findMinIndex(list,size)];
 }
+*/
 
 void printStatiscalRecord(double ti[],int minindex,int type){
 	switch(type){
@@ -82,6 +84,9 @@ void printStatiscalRecord(double ti[],int minindex,int type){
 			break;
 		case 1:
 			//cout << ti[0]<<fixed<<setprecision(4)<<setw(10)<<left<<ti[1]<<fixed<<setprecision(4)<<setw(10)<<left<<ti[2]<<fixed<<setprecision(4)<<setw(10)<<left<<minindex<<endl;
+			
+
+			
 			cout <<setw(10)<<left<<ti[0]<<fixed<<setprecision(4)<<setw(10)<<left<<ti[1]<<fixed<<setprecision(4)
 				 <<setw(10)<<left<<ti[2]<<fixed<<setprecision(4)<<setw(15)<<left<<ti[minindex]<<fixed<<setprecision(4)<<(minindex+1)<<endl;
 			break;
@@ -165,6 +170,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	
+	/* initial variable */
 	int NSimulation = atoi(argv[1]);
 	int K=atoi(argv[2]);
 	int n1=atoi(argv[3]);
@@ -174,7 +180,7 @@ int main(int argc, char *argv[]) {
 	double lamda2=atof(argv[7]);
 	double lamda3=atof(argv[8]);
 	
-	
+	/* print all setting values*/
 	cout << "================ Settings ================\n";
 	cout << "N_SIMULATION =" << NSimulation <<"\n";
 	cout << "ROUND_TRIP =" << K <<"\n";
@@ -187,7 +193,7 @@ int main(int argc, char *argv[]) {
 	
 	ErlangDistribution e1 (n1,lamda1);
 	ErlangDistribution e2 (n2,lamda2);
-	ErlangDistribution e3 (n3,lamda3);
+	ErlangDistribution e3 (n3,lamda3); // generate random variable
 	
 	
 	ErlangDistribution es [] = {e1,e2,e3};
@@ -196,7 +202,9 @@ int main(int argc, char *argv[]) {
 	int table[N_AP][N_AP] ={{0,0,0},{0,0,0},{0,0,0}};
 	double proptable[N_AP][N_AP] ={{0,0,0},{0,0,0},{0,0,0}};
 	double probAP []={0,0,0};
-	
+	double timerecord[NSimulation][N_AP] ={0};
+	double conditionalTable[N_AP][N_AP] ={0};
+
 	
 	
 	double ti=0;
@@ -205,18 +213,24 @@ int main(int argc, char *argv[]) {
 	ofstream statfile;
 	statfile.open("stat.txt");
 	//printStatiscalRecord(NULL,-1,0);
+
+	// simulation part 
 	for(int x=0;x<NSimulation;x++){
 		double t[]={0,0,0};
 		int minindex = -1;
+
+		// generate all ping value
 		for(int i=0;i<N_AP;i++){
 			ti=0;
 			for(int j=0;j<K;j++){
 				ti+= es[i].generateRandomNumber();
 			}
 			t[i]=ti;
+			timerecord[x][i]=ti;
 			//cout << "t["<<i<<"]="<<t[i]<<"\n";
 		}
 		
+		//count which one won the competitor e.g., 0>1 0>2 1>0......
 		for(int xx=0;xx<N_AP;xx++){
 			for(int yy=0;yy<N_AP;yy++){
 				if(xx!=yy){
@@ -226,15 +240,25 @@ int main(int argc, char *argv[]) {
 				}
 			}
 		}
+
+
+
 		string stat;
-		minindex = findMinIndex(t,3);
+		minindex = findMinIndex(t,3); // the best AP
 		//printStatiscalRecord(t,minindex,1);
-		stat+= to_string(t[0])+","+to_string(t[1])+","+to_string(t[2])+","+to_string(t[minindex])+","+to_string(minindex);
+		stat+= to_string(t[0])+","+to_string(t[1])+","+to_string(t[2])+","+to_string(t[minindex])+","+to_string(minindex); // write to text file
 		count[minindex]+=1; 
 		statfile << stat <<"\n"; 
 	}
 	statfile.close();
 	
+	for(int i=0;i<NSimulation;i++){
+		for(int j=0;j<N_AP;j++){
+			cout <<timerecord[i][j] <<","; 
+		}
+		cout<<endl;
+	}
+
 	for(int i=0;i<N_AP;i++){
 		double p=0;
 		cout << "count[" << i <<"]="<<count[i] <<"\n";
