@@ -99,6 +99,24 @@ void printStatiscalRecord(double ti[],int minindex,int type){
 	return (r==0||n==r)?1:nCr(n-1,r)+nCr(n-1,r-1);
 }*/
 
+unsigned long long fractorial(int n){
+
+	unsigned long long  frac = 1;
+    if(n==0||n==1)
+    {
+        frac = 1;
+    }
+    else
+    {
+        for(int i=1;i<=n;i++)
+        {
+            frac*=i;
+        }
+    }
+	
+	return frac;
+}
+
 unsigned long long int nCr(int n,int r){
 
     unsigned long long int  com = 1;
@@ -252,12 +270,12 @@ int main(int argc, char *argv[]) {
 	}
 	statfile.close();
 	
-	for(int i=0;i<NSimulation;i++){
+	/*for(int i=0;i<NSimulation;i++){
 		for(int j=0;j<N_AP;j++){
 			cout <<timerecord[i][j] <<","; 
 		}
 		cout<<endl;
-	}
+	}*/
 
 	for(int i=0;i<N_AP;i++){
 		double p=0;
