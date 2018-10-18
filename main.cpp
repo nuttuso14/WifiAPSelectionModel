@@ -135,6 +135,43 @@ unsigned long long int nCr(int n,int r){
 		return com;
 	}
 }
+double getProbValue(ErlangDistribution lists[],int i,int size){
+
+	//cout << "welcome to new model" << endl;
+
+	double pi=1;
+
+	if(size>0)
+	{
+		for(int m=0;m<size;m++)
+		{
+			if(i!=m)
+			{
+				ErlangDistribution eri = lists[i];
+                ErlangDistribution erm = lists[m];
+
+				double o11 = pow(eri.getLamda(),eri.getShape());
+				double o12 = fractorial((eri.getShape())-1);
+				double o1 = o11/o12;
+				cout << "o1 ="<<o1 <<endl;
+				double p=0;
+				for(int j=0;j<=(erm.getShape()-1);j++)
+				{
+					double cj = ((double)pow(erm.getLamda(),j))/((double)fractorial(j));
+					double c21 = fractorial(eri.getShape()+j-1);
+					double c2=cj*c21;
+					p+=c2;
+				}
+				cout << "new P ="<<p <<endl;
+				pi*=(o1*p);
+			}
+		}
+	}
+	else{
+		pi = -1;
+	}
+	return pi;
+}
 
 double getProbValue(ErlangDistribution lists[],int i,int K,int size){
 	double p=0;
@@ -180,6 +217,8 @@ double getProbValue(ErlangDistribution lists[],int i,int K,int size){
 	}
 	return pi;
 }
+
+
 
 int main(int argc, char *argv[]) {
 	
@@ -327,7 +366,12 @@ int main(int argc, char *argv[]) {
        // ap.simM = ap.getProbValue(ers, i, K); 
        // aps.set(i, ap);
        // System.out.println("P[AP"+(i+1)+"]="+aps.get(i).simM);
-        p2 = getProbValue(es, i, K,3);
+
+	    // old function
+        //p2 = getProbValue(es, i, K,3);
+
+		// new function
+		p2 = getProbValue(es, i,3);
 
         Mprob[i]=p2;
         cout << "P[AP"<<i<<" is the best]="<<fixed<<setprecision(8)<<p2<<"\n";
