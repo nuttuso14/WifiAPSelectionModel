@@ -135,10 +135,83 @@ unsigned long long int nCr(int n,int r){
 		return com;
 	}
 }
+
+double getProbValueHardCode(ErlangDistribution lists[],int i,int size){
+	
+	// this function use only n1=n2=n3=3
+	cout << endl<<"this function use only n1=n2=n3=3" << endl;
+	cout << "============================================="<<endl;
+	double pi=1;
+	if(size>0)
+	{
+	//try to generate cj
+		int indexCj[size-1]  ={0};
+		int index = 0;
+		for(int x=0;x<size;x++){
+			if(i!=x)
+			{
+				//cout << "helloooo" <<endl;
+				indexCj[index] = x;
+				index++;
+			}			
+		}
+
+		cout << "find P[AP"<<i<<"]=min("<<"t"<<indexCj[0]<<",t"<<indexCj[1]<<")"<<endl;
+		/*for(int y=0;y<2;y++){
+			cout << " =" <<indexCj[y] << endl;
+		}*/
+
+
+		ErlangDistribution eri = lists[i];
+		ErlangDistribution erm1 = lists[indexCj[0]]; //Ap2
+		ErlangDistribution erm2 = lists[indexCj[1]]; //Ap3
+
+		cout << "lamda"<<indexCj[0]<<"="<<erm1.getLamda() << " , lamda"<<indexCj[1]<<"="<<erm2.getLamda()<<endl; 
+
+		double c[5]={0};
+		
+		/*c[0]=1;
+		c[1]=erm1.getLamda()+erm2.getLamda();
+		c[2]=((double)((pow(erm1.getLamda(),2)/2)))+(erm1.getLamda()*erm2.getLamda())+((double)((pow(erm2.getLamda(),2)/2)));
+		c[3]=(double)(((erm1.getLamda()*pow(erm2.getLamda(),2))+(pow(erm1.getLamda(),2)*erm2.getLamda()))/2);
+		c[4]=double(pow(erm1.getLamda(),2)*pow(erm2.getLamda(),2)/4);*/
+
+		c[0]=1;
+		c[1]=erm1.getLamda()+erm2.getLamda();
+		c[2]=((double)((pow(erm1.getLamda(),2))))+(erm1.getLamda()*erm2.getLamda())+((double)((pow(erm2.getLamda(),2))));
+		c[3]=(double)(((erm1.getLamda()*pow(erm2.getLamda(),2))+(pow(erm1.getLamda(),2)*erm2.getLamda())));
+		c[4]=double(pow(erm1.getLamda(),2)*pow(erm2.getLamda(),2));
+
+
+
+		double p=0;
+		for(int j=0;j<5;j++)
+		{
+			double c21 = fractorial(eri.getShape()+j-1);
+			double c2=c[j]*c21;
+			//cout << "c2=" << c2 <<endl;
+			cout <<"c"<<j<<"="<<c[j]<< " (k"<<i<<"+j-1)!=("<<eri.getShape()+j-1<<")!="<<c21<< " cj*(k+j-1)!="<<c2<<endl;
+			p+=c2;
+		}
+		cout << "h(t)="<<p<<endl;
+		double o11 = pow(eri.getLamda(),eri.getShape());
+		double o12 = fractorial((eri.getShape())-1);
+		double o1 = o11/o12;
+		cout << "lamda"<<i<<"^k"<<i<<"="<<eri.getLamda()<<"^"<<eri.getShape()<<"="<<o11<<" (k"<<i<<"-1)!="<<"("<<((eri.getShape())-1)<<")!="<<o12<<" (lamda"<<i<<"^k"<<i<<")/(k"<<i<<"-1)!="<<o1<<endl;
+		//cout << "o1=" << o1 << endl;
+		pi*=(o1*p);
+		cout <<endl<< "((lamda"<<i<<"^k"<<i<<")/(k"<<i<<"-1)!)*h(t)="<<pi<<endl;
+
+	}
+	else{
+		pi = -1;
+	}
+	return pi;
+}
+
 double getProbValue(ErlangDistribution lists[],int i,int size){
 
 	//cout << "welcome to new model" << endl;
-
 	double pi=1;
 
 	if(size>0)
@@ -371,7 +444,7 @@ int main(int argc, char *argv[]) {
         //p2 = getProbValue(es, i, K,3);
 
 		// new function
-		p2 = getProbValue(es, i,3);
+		p2 = getProbValueHardCode(es, i,3);
 
         Mprob[i]=p2;
         cout << "P[AP"<<i<<" is the best]="<<fixed<<setprecision(8)<<p2<<"\n";
