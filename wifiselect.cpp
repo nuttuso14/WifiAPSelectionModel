@@ -6,6 +6,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip> // setprecision
+#include <vector>
 
 using namespace std;
 
@@ -243,10 +244,10 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
             er[n+1] = lists[indexCj[n]];
         }
 
-        for(int x=0;x<size;x++)
+        /*for(int x=0;x<size;x++)
         {
             cout << "n="<<er[x].getShape()<< " lamda=" << er[x].getLamda() <<endl;
-        }
+        }*/
 
         //generate Cj ......
         int upperbound = 1;
@@ -256,7 +257,29 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
         }
         cout << "there are Cj="<<upperbound <<endl;
 
+		vector<double*> poly;
+		for(int n=0;n<size;n++){
+			int nKn = ((k*er[n].getShape())-1);
+			double arr[nKn] = {0};
+			for(int j=0;j<nKn;j++){
+					double res = (double)pow(er[n].getLamda(),j)/(double)fractorial(j);
+					cout << "res"<<j<<" = " << res <<endl;
+					arr[j]= res;
 
+			}
+			poly.push_back(arr);
+		}
+		cout << "poly size = "<< poly.size() << endl;
+		for(int i=0;i<poly.size();i++){
+			cout << "the " << (i+1) << "th "<<endl;
+			cout << "=============================" <<endl;
+			double* arr = poly[i];
+			int nKn = ((k*er[i].getShape())-1);
+			for(int j=0;j<nKn;j++){
+				cout << "arr["<<j<<"]="<<arr[j]<<endl;
+			}
+			cout << "=============================" <<endl;
+		}
     }
     else{
         pi=-1;
