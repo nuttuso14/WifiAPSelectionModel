@@ -257,14 +257,14 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
         }
         cout << "there are Cj="<<upperbound <<endl;
 
-		vector<double*> poly;
+		vector<vector<double>> poly;
 		for(int n=0;n<size;n++){
 			int nKn = ((k*er[n].getShape())-1);
-			double arr[nKn] = {0};
+			vector<double> arr;
 			for(int j=0;j<nKn;j++){
 					double res = (double)pow(er[n].getLamda(),j)/(double)fractorial(j);
 					cout << "res"<<j<<" = " << res <<endl;
-					arr[j]= res;
+					arr.push_back(res);
 
 			}
 			poly.push_back(arr);
@@ -273,8 +273,9 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 		for(int i=0;i<poly.size();i++){
 			cout << "the " << (i+1) << "th "<<endl;
 			cout << "=============================" <<endl;
-			double* arr = poly[i];
 			int nKn = ((k*er[i].getShape())-1);
+			vector<double> arr = poly[i];
+			
 			for(int j=0;j<nKn;j++){
 				cout << "arr["<<j<<"]="<<arr[j]<<endl;
 			}
