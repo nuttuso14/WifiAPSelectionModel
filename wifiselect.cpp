@@ -62,8 +62,8 @@ class Polynomial{
 };
 
 ErlangDistribution::ErlangDistribution () {
-	time_t t;
-	srand((unsigned) time(&t)+rand());
+	//time_t t;
+	//srand((unsigned) time(&t)+rand());
 }
 
 ErlangDistribution::ErlangDistribution (int a, double b) {
@@ -438,22 +438,56 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 
 int main(int argc, char *argv[]) {
 	
-	if (argc < 9) {
-		cerr << "Usage: " << argv[0] << " <SIM_ROUND> " << " <ROUND_TRIP> " << " <N1> "  	<< " <N2> " << " <N3> " << " <LAMDA1> " << " <LAMDA2> " << " <LAMDA3> " << endl;
+	if (argc < 8) {
+		cerr << "Usage: " << argv[0] << " <SIM_ROUND> " <<" <Num_AP>" << " <ROUND_TRIP> " << " <N1> "  	<< " <N2> " << " ... " << " <LAMDA1> " << " <LAMDA2> " << " ... " << endl;
 		return 1;
 	}
 	
+	
 	/* initial variable */
 	int NSimulation = atoi(argv[1]);
-	int K=atoi(argv[2]);
-	int n1=atoi(argv[3]);
+	int N_AP = atoi(argv[2]);
+	int K=atoi(argv[3]);
+
+	int wifi_para = (argc-1)-3;
+
+	if(double(wifi_para/N_AP)!=2){
+		cerr << "Enter Parameters : <N1> <N2> ... <LAMDA1> <LAMDA2>";
+		return 1;
+	}
+
+	int Ni[N_AP];
+	int LAMDAs[N_AP];
+	for(int i=0;i<N_AP;i++)
+	{
+		Ni[i]=atoi(argv[4+i]);
+		LAMDAs[i]=atoi(argv[4+N_AP+i]);
+	}
+
+	/*int n1=atoi(argv[3]);
 	int n2=atoi(argv[4]);
 	int n3=atoi(argv[5]);
 	double lamda1=atof(argv[6]);
 	double lamda2=atof(argv[7]);
-	double lamda3=atof(argv[8]);
+	double lamda3=atof(argv[8]);*/
 	
 	/* print all setting values*/
+
+	cout << "================ Settings ================\n";
+	cout << "N_SIMULATION =" << NSimulation <<"\n";
+	cout << "N_WIFI_AP =" << N_AP <<"\n";
+	cout << "ROUND_TRIP =" << K <<"\n";
+	for(int i=0;i<N_AP;i++)
+	{
+		cout << "N"<<(i+1)<<" =" << Ni[i] <<"\n";
+	}
+
+	for(int i=0;i<N_AP;i++)
+	{
+		cout << "LAMDA"<<(i+1)<<" =" << LAMDAs[i] <<"\n";
+	}
+
+	/*
 	cout << "================ Settings ================\n";
 	cout << "N_SIMULATION =" << NSimulation <<"\n";
 	cout << "ROUND_TRIP =" << K <<"\n";
@@ -462,34 +496,44 @@ int main(int argc, char *argv[]) {
 	cout << "N3 =" << n3 <<"\n";
 	cout << "LAMDA1 =" << lamda1 <<"\n";
 	cout << "LAMDA2 =" << lamda2 <<"\n";
-	cout << "LAMDA3 =" << lamda3 <<"\n";
+	cout << "LAMDA3 =" << lamda3 <<"\n";*/
 	
+	ErlangDistribution es[N_AP]; // generate random variable
+
+	for(int i=0;i<N_AP;i++){
+		ErlangDistribution e (Ni[i],LAMDAs[i]);
+		es[i]= e;
+	}
+
+/*
 	ErlangDistribution e1 (n1,lamda1);
 	ErlangDistribution e2 (n2,lamda2);
-	ErlangDistribution e3 (n3,lamda3); // generate random variable
+	ErlangDistribution e3 (n3,lamda3); */
 	
 	
-	ErlangDistribution es [] = {e1,e2,e3};
-	int N_AP = 3;
-	int count [] = {0,0,0};
-	int table[N_AP][N_AP] ={{0,0,0},{0,0,0},{0,0,0}};
-	double proptable[N_AP][N_AP] ={{0,0,0},{0,0,0},{0,0,0}};
-	double probAP []={0,0,0};
+	//ErlangDistribution es [] = {ei};
+	
+	//int count [] = {0,0,0};
+	//int table[N_AP][N_AP] ={{0,0,0},{0,0,0},{0,0,0}};
+	//double proptable[N_AP][N_AP] ={{0,0,0},{0,0,0},{0,0,0}};
+	//double probAP []={0,0,0};
 	//double timerecord[NSimulation][N_AP] ={0};
 	//double conditionalTable[N_AP][N_AP] ={0};
 
+	int count [N_AP] = {0};
+	double probAP [N_AP]={0};
 	
 	
 	double ti=0;
 	
 	cout << "================ Simulation ================\n";
-	ofstream statfile;
-	statfile.open("stat.txt");
+	//ofstream statfile;
+	//statfile.open("stat.txt");
 	//printStatiscalRecord(NULL,-1,0);
 
 	// simulation part 
 	for(int x=0;x<NSimulation;x++){
-		double t[]={0,0,0};
+		double t[N_AP]={0};
 		int minindex = -1;
 
 		// generate all ping value
@@ -517,7 +561,7 @@ int main(int argc, char *argv[]) {
 
 
 		//string stat;
-		minindex = findMinIndex(t,3); // the best AP
+		minindex = findMinIndex(t,N_AP); // the best AP
 		//printStatiscalRecord(t,minindex,1);
 		//stat+= to_string(t[0])+","+to_string(t[1])+","+to_string(t[2])+","+to_string(t[minindex])+","+to_string(minindex); // write to text file
 		count[minindex]+=1; 
@@ -575,7 +619,7 @@ int main(int argc, char *argv[]) {
 
 	cout << "================ Math Anaysis ================\n";
 
-	double Mprob[]={0,0,0};
+	double Mprob[N_AP]={0};
 	double p2 = 0,psum =0;
     for(int i=0;i<N_AP;i++){
       //  APSelection ap = aps.get(i);
@@ -587,7 +631,7 @@ int main(int argc, char *argv[]) {
         //p2 = getProbValue(es, i, K,3);
 
 		// new function
-		p2 = getProbValue(es, i,K,3);
+		p2 = getProbValue(es, i,K,N_AP);
 
         Mprob[i]=p2;
         cout << "P[AP"<<i<<" is the best]="<<fixed<<setprecision(8)<<p2<<"\n";
@@ -596,7 +640,14 @@ int main(int argc, char *argv[]) {
     }
     cout << "sum of P = " << psum << endl;
     string content;
-	content = to_string(NSimulation)+","+to_string(K)+","+to_string(n1)+","+to_string(n2)+","+to_string(n3)+","+to_string(lamda1)+","+to_string(lamda2)+","+to_string(lamda3);
+	content = to_string(NSimulation)+","+to_string(N_AP)+","+to_string(K);
+	
+	 for(int i=0;i<N_AP;i++){
+		content+=","+to_string(Ni[i]); 
+	 }
+	  for(int i=0;i<N_AP;i++){
+		content+=","+to_string(LAMDAs[i]); 
+	 }
 	
     for(int i=0;i<N_AP;i++){
     	content+=","+to_string(probAP[i]);
