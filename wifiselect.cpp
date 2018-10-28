@@ -124,9 +124,9 @@ void printStatiscalRecord(double ti[],int minindex,int type){
 	return (r==0||n==r)?1:nCr(n-1,r)+nCr(n-1,r-1);
 }*/
 
-unsigned long long fractorial(int n){
+double fractorial(int n){
 
-	unsigned long long  frac = 1;
+	double  frac = 1;
     if(n==0||n==1)
     {
         frac = 1;
@@ -345,18 +345,17 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 			vector<Polynomial> nextpoly = poly[i];
 			int indicateMj[upperbound];
 			fill_n(indicateMj,upperbound,-1);
-			//cout << "aaaa"<<endl;
 			
 			int ti=1;
 			int indexMj = 0;
 			for(int x=0;x<cj.size();x++)
 			{
-				//cout << "bb"<<endl;
+		
 				double ci = 0;
 				
 				for(int j=0;j<nextpoly.size();j++)
 				{
-					//cout << "cc"<<endl;
+	
 					ci = (cj[x].getCoefficient()*nextpoly[j].getCoefficient());
 					ti = cj[x].getDegree()+nextpoly[j].getDegree();
 					//cout << "ti="<<ti<<endl;
@@ -382,13 +381,12 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 
 			//update cj by mj
 			int insertCj = cj.size();
-			cout << "Mj.size =" << Mj.size() << endl;
+			//cout << "Mj.size =" << Mj.size() << endl;
 			for(int m=0;m<Mj.size();m++)
 			{
-				//cout<< "ffff"<<endl;
+			
 				if(indicateCj[Mj[m].getDegree()]==-1)
 				{
-					//cout<< "gggg"<<endl;
 					cj.push_back(Mj[m]);
 					indicateCj[Mj[m].getDegree()]=insertCj;
 					insertCj++;
@@ -397,8 +395,6 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 				{
 					//update
 
-					//cout<< "eeee"<<","<<indicateCj[Mj[m].getDegree()]<<endl;
-					//cout<< "fuck:" << cj[indicateCj[Mj[m].getDegree()]].getCoefficient()<<endl;
 					cj[indicateCj[Mj[m].getDegree()]].setCoefficient(Mj[m].getCoefficient());
 
 					//cj[indicateCj[Mj[m].getDegree()]].setCoefficient(Mj[indicateCj[Mj[m].getDegree()]].getCoefficient());
@@ -408,10 +404,7 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 			}
 
 		}
-		/*for(int i=0;i<cj.size();i++){
-			cout << "cj["<<i<<"]="<<cj[i].getCoefficient() << " degree:"<< cj[i].getDegree() << endl ;
-		}*/
-	//	cout<< "Fuck You"<<endl;
+
 		//cout << "last cj.size =" << cj.size() <<endl;
 		
 		
@@ -423,7 +416,7 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 		//	double c2=((double)(c[j]/fractorial(j)))*c21;
 			double c2=double((cj[j].getCoefficient()*c21)/c22);
 			//cout << "sumlamda="<< sumlamda <<" ,c2=" << c2 <<endl;
-			//cout <<"c"<<j<<"="<<c[j]<< " (k"<<i<<"+j-1)!=("<<eri.getShape()+j-1<<")!="<<c21<< " cj*(k+j-1)!="<<c2<<endl;
+			//cout <<"c"<<j<<"="<<cj[j].getCoefficient()<< " (k"<<i<<"+j-1)!=("<<(k*er[0].getShape())+j-1<<")!="<<c21<< " cj*(k+j-1)!="<<c2<<endl;
 			p+=c2;
 		}
 		//cout << "h(t)="<<p<<endl;
