@@ -42,6 +42,25 @@ class ErlangDistribution {
 	
 };
 
+class Polynomial{
+	double coefficeint;
+	int t_degree;
+	public:
+	Polynomial(double,int);
+	double getCoefficient(){
+		return coefficeint;
+	}
+	int getDegree(){
+		return t_degree;
+	}
+	void setCoefficient(double a){
+		coefficeint = a;
+	}
+	void setDegree(int b){
+		t_degree = b;
+	}
+};
+
 ErlangDistribution::ErlangDistribution () {
 	time_t t;
 	srand((unsigned) time(&t)+rand());
@@ -52,6 +71,11 @@ ErlangDistribution::ErlangDistribution (int a, double b) {
 	lamda = b;
 	time_t t;
 	srand((unsigned) time(&t)+rand());
+}
+
+Polynomial::Polynomial(double a,int b){
+	coefficeint = a;
+	t_degree = b;
 }
 
 int findMinIndex(double list[],int size){
@@ -135,6 +159,17 @@ unsigned long long int nCr(int n,int r){
         }
 		return com;
 	}
+}
+
+int* initvalue(int arr[],int value,int size){
+	
+	if(size>0){
+		for(int i=0;i<size;i++){
+			arr[i] = value;
+		}
+	}
+	return arr;
+
 }
 
 double getProbValueHardCode(ErlangDistribution lists[],int i,int k,int size){
@@ -231,17 +266,18 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 			}			
 		}
 
-        cout << "find P[AP"<<i<<"]=min("<<"t"<<indexCj[0]<<",t"<<indexCj[1]<<")"<<endl;
+        //cout << "find P[AP"<<i<<"]=min("<<"t"<<indexCj[0]<<",t"<<indexCj[1]<<")"<<endl;
 
         // initial all APs 
         ErlangDistribution er[size];
 
         er[0] = lists[i];
-
+		double sumlamda =er[0].getLamda();
         
         for(int n=0;n<index;n++)
         {
             er[n+1] = lists[indexCj[n]];
+			sumlamda += er[n+1].getLamda();
         }
 
         /*for(int x=0;x<size;x++)
@@ -250,37 +286,154 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
         }*/
 
         //generate Cj ......
-        int upperbound = 1;
+        int upperbound = 0;
         for(int i=1;i<size;i++){
-            cout << "k =" << k << " n="<< er[i].getShape() << endl;
-            upperbound *= ((k*er[i].getShape())-1);
+           // cout << "k =" << k << " n="<< er[i].getShape() << endl;
+           // upperbound *= ((k*er[i].getShape())-1);
+		   upperbound+=((k*er[i].getShape())-1);
         }
-        cout << "there are Cj="<<upperbound <<endl;
+		upperbound = upperbound+1;
+       // cout << "there are Cj="<<upperbound <<endl;
 
-		vector<vector<double>> poly;
-		for(int n=0;n<size;n++){
+		vector<vector<Polynomial>> poly;
+
+		// collect each h(t)
+		for(int n=1;n<size;n++){
 			int nKn = ((k*er[n].getShape())-1);
-			vector<double> arr;
-			for(int j=0;j<nKn;j++){
-					double res = (double)pow(er[n].getLamda(),j)/(double)fractorial(j);
-					cout << "res"<<j<<" = " << res <<endl;
-					arr.push_back(res);
-
+			vector<Polynomial> arr;
+			for(int j=0;j<=nKn;j++){
+				double res = (double)pow(er[n].getLamda(),j)/(double)fractorial(j);
+				Polynomial pl(res,j);
+				arr.push_back(pl);
 			}
 			poly.push_back(arr);
 		}
-		cout << "poly size = "<< poly.size() << endl;
+
+		//print
+		/*cout << "poly size = "<< poly.size() << endl;
 		for(int i=0;i<poly.size();i++){
 			cout << "the " << (i+1) << "th "<<endl;
 			cout << "=============================" <<endl;
-			int nKn = ((k*er[i].getShape())-1);
-			vector<double> arr = poly[i];
-			
-			for(int j=0;j<nKn;j++){
-				cout << "arr["<<j<<"]="<<arr[j]<<endl;
+			vector<Polynomial> arr = poly[i];
+			cout << "arr size ="<< arr.size() << endl;
+			for(int j=0;j<arr.size();j++)
+			{
+				Polynomial pl = arr[j];
+				cout << "arr["<<j<<"]="<<pl.getCoefficient() << ", degree: t^" << pl.getDegree() <<endl;
 			}
 			cout << "=============================" <<endl;
+		}*/
+
+		// initial some cj
+		vector<Polynomial> cj; 
+	//	cout << "ddd" << endl;
+		int indicateCj[upperbound];
+		fill_n(indicateCj,upperbound,-1);
+	//	cout << "hhhhh" << endl;
+		vector<Polynomial> firstpoly = poly[0];
+		for(int i=0;i<firstpoly.size();i++)
+		{
+			cj.push_back(firstpoly[i]);
+			indicateCj[firstpoly[i].getDegree()] = i;
 		}
+		//cout << "first cj.size =" << cj.size() << ",,"<<upperbound <<endl;
+
+		for(int i=1;i<poly.size();i++)
+		{	
+			//cout << "i="<<i <<endl;
+			vector<Polynomial> Mj; 
+			vector<Polynomial> nextpoly = poly[i];
+			int indicateMj[upperbound];
+			fill_n(indicateMj,upperbound,-1);
+			//cout << "aaaa"<<endl;
+			
+			int ti=1;
+			int indexMj = 0;
+			for(int x=0;x<cj.size();x++)
+			{
+				//cout << "bb"<<endl;
+				double ci = 0;
+				
+				for(int j=0;j<nextpoly.size();j++)
+				{
+					//cout << "cc"<<endl;
+					ci = (cj[x].getCoefficient()*nextpoly[j].getCoefficient());
+					ti = cj[x].getDegree()+nextpoly[j].getDegree();
+					//cout << "ti="<<ti<<endl;
+					Polynomial poi(ci,ti);
+
+					// store in mj
+					if(indicateMj[ti]==-1) // no index in desried t_degree
+					{
+						indicateMj[ti]=indexMj;
+						Mj.push_back(poi);
+						indexMj++;
+					}
+					else{
+						Mj[indicateMj[ti]].setCoefficient(Mj[indicateMj[ti]].getCoefficient()+poi.getCoefficient());
+					}
+				}
+			}
+
+			/*for(int k=0;k<Mj.size();k++)
+			{
+				cout << "Mj["<<k<<"]="<<Mj[k].getCoefficient() << " degree:"<< Mj[k].getDegree() << endl ;
+			}*/	
+
+			//update cj by mj
+			int insertCj = cj.size();
+			cout << "Mj.size =" << Mj.size() << endl;
+			for(int m=0;m<Mj.size();m++)
+			{
+				//cout<< "ffff"<<endl;
+				if(indicateCj[Mj[m].getDegree()]==-1)
+				{
+					//cout<< "gggg"<<endl;
+					cj.push_back(Mj[m]);
+					indicateCj[Mj[m].getDegree()]=insertCj;
+					insertCj++;
+				}
+				else
+				{
+					//update
+
+					//cout<< "eeee"<<","<<indicateCj[Mj[m].getDegree()]<<endl;
+					//cout<< "fuck:" << cj[indicateCj[Mj[m].getDegree()]].getCoefficient()<<endl;
+					cj[indicateCj[Mj[m].getDegree()]].setCoefficient(Mj[m].getCoefficient());
+
+					//cj[indicateCj[Mj[m].getDegree()]].setCoefficient(Mj[indicateCj[Mj[m].getDegree()]].getCoefficient());
+				//	cout<< "hhhh:" << cj[indicateCj[Mj[m].getDegree()]].getCoefficient()<<endl;
+				}
+				//cout<< "kkkk"<<endl;
+			}
+
+		}
+		/*for(int i=0;i<cj.size();i++){
+			cout << "cj["<<i<<"]="<<cj[i].getCoefficient() << " degree:"<< cj[i].getDegree() << endl ;
+		}*/
+	//	cout<< "Fuck You"<<endl;
+		//cout << "last cj.size =" << cj.size() <<endl;
+		
+		
+		double p=0;
+		for(int j=0;j<cj.size();j++)
+		{
+			double c21 = fractorial((k*er[0].getShape())+j-1);
+			double c22 = pow(sumlamda,(k*er[0].getShape())+j);
+		//	double c2=((double)(c[j]/fractorial(j)))*c21;
+			double c2=double((cj[j].getCoefficient()*c21)/c22);
+			//cout << "sumlamda="<< sumlamda <<" ,c2=" << c2 <<endl;
+			//cout <<"c"<<j<<"="<<c[j]<< " (k"<<i<<"+j-1)!=("<<eri.getShape()+j-1<<")!="<<c21<< " cj*(k+j-1)!="<<c2<<endl;
+			p+=c2;
+		}
+		//cout << "h(t)="<<p<<endl;
+		double o11 = pow(er[0].getLamda(),(k*er[0].getShape()));
+		double o12 = fractorial((k*(er[0].getShape()))-1);
+		double o1 = o11/o12;
+		//cout << "lamda"<<i<<"^k"<<i<<"="<<eri.getLamda()<<"^"<<eri.getShape()<<"="<<o11<<" (k"<<i<<"-1)!="<<"("<<((eri.getShape())-1)<<")!="<<o12<<" (lamda"<<i<<"^k"<<i<<")/(k"<<i<<"-1)!="<<o1<<endl;
+		//cout << "o1=" << o1 << endl;
+		pi*=(o1*p);
+
     }
     else{
         pi=-1;
