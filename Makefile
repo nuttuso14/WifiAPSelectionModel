@@ -1,15 +1,16 @@
 CC = g++
 CFLAGS = -g -c
+STANDARD = -std=c++11
 
 
-all: main 
+all: wifiselect 
 
-main: main.o
+wifiselect: wifiselect.o
 	$(CC) -o $@ $? 
 
-main.o:	main.cpp
-	$(CC) $(CFLAGS) -o $@ main.cpp 
+wifiselect.o:	wifiselect.cpp
+	$(CC) $(STANDARD) $(CFLAGS) -o $@ wifiselect.cpp 
 
 clean:
-	rm *.exe *.o *.txt main 
+	rm *.o *.txt wifiselect 
 
