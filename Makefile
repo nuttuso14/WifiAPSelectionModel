@@ -3,14 +3,14 @@ CFLAGS = -g -c
 STANDARD = -std=c++11
 
 
-all: wifiselect 
+all: bestWifiAP 
 
-wifiselect: wifiselect.o
+bestWifiAP: bestWifiAP.o
 	$(CC) -o $@ $? 
 
-wifiselect.o:	wifiselect.cpp
-	$(CC) $(STANDARD) $(CFLAGS) -o $@ wifiselect.cpp 
+bestWifiAP.o:	bestWifiAP.cpp
+	$(CC) $(STANDARD) $(CFLAGS) -o $@ bestWifiAP.cpp 
 
 clean:
-	rm *.o *.txt wifiselect 
+	rm *.o *.txt bestWifiAP 
 
