@@ -97,15 +97,34 @@ class DataFigure{
 };
 
 int selectMinIndex(vector<WifiData> wf){
-    int i=-1;
+    int i=0;
     double temp = wf[0].getMean();
+    int x=0;
     for(WifiData w:wf)
     {
         if(w.getMean()<temp){
             temp = w.getMean();
-            i = w.getQ_AP();
+            //i = w.getQ_AP();
+            i = x;
+        }
+        x++;
+    }
+
+    if(i==0) //every expected download time is same
+    {
+        double pmax = wf[0].getSim_prob();
+        int y = 0;
+        for(WifiData w:wf)
+        {
+            if(w.getSim_prob()>pmax){
+                pmax = w.getSim_prob();
+                //i = w.getQ_AP();
+                i = y;
+            }
+            y++;
         }
     }
+
     return i;
 }
 
@@ -127,7 +146,7 @@ int main(int argc, char *argv[]) {
     }
     else cout << "Unable to open file"; 
 
-    cout << "new method"<<endl;
+    //cout << "new method"<<endl;
 
     for(string  s : lineitems)
     {
@@ -197,18 +216,33 @@ int main(int argc, char *argv[]) {
         df.setWifiData(wifis);
         figs.push_back(df);
     }
-    cout << "figs:"<< figs.size()<<endl;
+   // cout << "figs:"<< figs.size()<<endl;
     int i=0;
+    ofstream outfile;
+    outfile.open("figure.txt",ios_base::app);
+ 
+
     for(DataFigure dd: figs)
     {
-        cout << "line"<<(i+1)<<":"<<endl;
+       /* cout << "line"<<(i+1)<<":"<<endl;
         for(WifiData dt:dd.getWifiData())
         {
             cout <<dt.getQ_AP()<<","<< dt.getN_shape()<< "," <<dt.getLamda()<< "," <<dt.getSim_prob()<< "," <<dt.getM_prob()<< "," <<dt.getError()<<","<<dt.getMean() <<endl;
             
         }
-        cout << "Expected min download time:" << selectMinIndex(dd.getWifiData())<<endl;
+        cout << "Expected min download time:" << (selectMinIndex(dd.getWifiData())+1)<<endl;*/
+        vector<WifiData> dt = dd.getWifiData();
+        int x = selectMinIndex(dt);
+        
+        string content;
+        content = to_string(dd.getN_sim()) +"," + to_string(dd.getN_AP()) + "," + to_string(dd.getK()) +"," \
+                  + to_string(dt[x].getQ_AP())+"," + to_string(dt[x].getMean())+"," +to_string(dt[x].getSim_prob());
         i++;
+        outfile << content <<"\n"; 
     }
+
+    //outfile << content <<"\n"; 
+    outfile.close();
+    cout << "write successfully, see figure.txt" <<endl;
     return 0;
 }
