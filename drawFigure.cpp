@@ -11,7 +11,7 @@ using namespace std;
 
 class WifiData{
     int q_ap,n_shape;
-    double lambda,simprob, mathprob;
+    double lambda,eti_k,simprob, mathprob;
     string error;
     public:
     void setQ_AP(int n){
@@ -19,6 +19,9 @@ class WifiData{
     }
     void setN_shape(int n){
         n_shape = n;
+    }
+    void setEti_K(double n){
+        eti_k = n;
     }
     void setLamda(double n){
         lambda = n;
@@ -38,6 +41,9 @@ class WifiData{
     }
     int getN_shape(){
         return n_shape;
+    }
+    double getEti_k(){
+        return eti_k;
     }
     double getLamda(){
         return lambda;
@@ -197,7 +203,8 @@ int main(int argc, char *argv[]) {
 
         mathdata[0]= init;
         for(int i=1;i<df.getN_AP();i++){
-            mathdata[i]=init +(i*3);
+            mathdata[i]=init +(i*4);
+            cout << mathdata[i]<<endl;
         }
 
         int r=0;
@@ -206,9 +213,10 @@ int main(int argc, char *argv[]) {
             wifi.setQ_AP((r+1));
             wifi.setN_shape(stoi(datum[i]));
             wifi.setLamda(stof(datum[i+df.getN_AP()]));
-            wifi.setSim_prob(stof(datum[mathdata[r]]));
-            wifi.setM_prob(stof(datum[mathdata[r]+1]));
-            wifi.setError(datum[mathdata[r]+2]);
+            wifi.setEti_K(stof(datum[mathdata[r]]));
+            wifi.setSim_prob(stof(datum[mathdata[r]+1]));
+            wifi.setM_prob(stof(datum[mathdata[r]+2]));
+            wifi.setError(datum[mathdata[r]+3]);
             //wifi.setSim_prob(stof(datum[]));
             r++;
             wifis.push_back(wifi);
@@ -236,7 +244,8 @@ int main(int argc, char *argv[]) {
         
         string content;
         content = to_string(dd.getN_sim()) +"," + to_string(dd.getN_AP()) + "," + to_string(dd.getK()) +"," \
-                  + to_string(dt[x].getQ_AP())+"," + to_string(dt[x].getMean())+"," +to_string(dt[x].getSim_prob());
+                  + to_string(dt[x].getQ_AP()) +"," + to_string(dt[x].getMean())+","  + to_string(dt[x].getEti_k())+ "," \
+                 +to_string(dt[x].getSim_prob()) +","+ to_string(dt[x].getM_prob())+","+ dt[x].getError();
         i++;
         outfile << content <<"\n"; 
     }
