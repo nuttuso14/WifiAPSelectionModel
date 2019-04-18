@@ -367,7 +367,7 @@ double getProbValue(ErlangDistribution lists[],int i,int k,int size){
 }
 double computePercentile(double tl[],int size,int percent){
 
-	int n = floor(((double)percent/100)*(size+1));
+	int n = ceil(((double)percent/100)*(size+1));
 	//int n_first = floor(n);
 	//int n_back = ceil(n);
 	//cout << "percent: "<<percent << " Size:" << size << endl;
@@ -450,12 +450,15 @@ int main(int argc, char *argv[]) {
 	double tl1max =0;
 	double tl2min =0;
 	double ti=0;
+	int k2 =0;
+	int k1 =0;
 	
 	cout << "================ Simulation ================\n";
 
 	// simulation part 
 	for(int x=0;x<NSimulation;x++)
 	{
+		//cout << x <<endl;
 		double t[N_AP]={0};
 		int minindex = -1;
 
@@ -478,7 +481,7 @@ int main(int argc, char *argv[]) {
 
 		// game 1
 		//cout << "========= Game 1 ========="<<endl;
-		int k1 = ceil(K/3);
+		 k1 = ceil(K/2);
 		//cout << "k1 =" <<k1 <<endl;
 		double tl[N_AP] = {0};
 		double sum_ti = 0;
@@ -494,31 +497,42 @@ int main(int argc, char *argv[]) {
 			
 			//cout  << "T_"<<i<<"(1) = " << tl[i]<<endl;
 		}
-		int indexMax = findIndex(tl,N_AP,MAX);
+		
 		//cout << "tl1 =MAX(T_("<<indexMax <<")_K)="<< tl[indexMax] <<endl;
-		double threshold = computePercentile(tl,N_AP,10);
+		double threshold = computePercentile(tl,N_AP,25);
 		//cout << "Threshold = " << threshold <<endl; 
-		tl1max += tl[indexMax];
+		
 		vector<int> ins;
+		vector<double> tn;
 		for(int i=0;i<N_AP;i++)
 		{
 			if(tl[i]<=threshold)
 			{
 				//cout << "Select AP"<<i<<endl;
 				ins.push_back(i);
+				tn.push_back(tl[i]);
 			}	
 		}
+		double tns[tn.size()]={0};
+
+		for(int i=0;i<tn.size();i++){
+			tns[i]= tn[i];
+		}
+
+		int indexMax = findIndex(tns,tn.size(),MAX);
+		tl1max += tl[ins[indexMax]];
 		//cout << "Select candidate |N| = "<< ins.size() <<endl; 
 
 		//game 2
 		//cout << "========= Game 2 =========" << endl; 
 
-		int k2 = ceil(K*0.75);
+		  k2 = ceil(K*0.8);
+		//cout << "k2 =" <<k2 <<endl;
 		double tl2[ins.size()] = {0};
 		for(int i=0;i<ins.size();i++)
 		{
 			double t2 =0;
-			for(int j=0;j<K;j++)
+			for(int j=0;j<k2;j++)
 			{
 				t2+=es[ins[i]].generateRandomNumber();
 			}
@@ -562,6 +576,8 @@ int main(int argc, char *argv[]) {
 
 	double Etl1max = tl1max/double(NSimulation);
 	double Etl2min = tl2min/double(NSimulation);
+	cout << "k1 = " << k1 <<endl;
+	cout << "k2 = " << k2 <<endl;
 	cout << "MAX(E[tl_1])="<<Etl1max<<endl;
 	cout << "MIN(E[tl_2])="<<Etl2min<<endl;
 
