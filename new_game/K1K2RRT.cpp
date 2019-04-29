@@ -462,6 +462,7 @@ int main(int argc, char *argv[]) {
 	double tl1max =0;
 	double tl2min =0;
 	double ti=0;
+	double Etlgame  = 0;
 	//int k2 =0;
 	//int k1 =0;
 	
@@ -611,6 +612,7 @@ int main(int argc, char *argv[]) {
 
 		double Etl1max = tl1max/double(NSimulation);
 		double Etl2min = tl2min/double(NSimulation);
+		Etlgame = Etl1max + Etl2min; 
 		cout << "k1 = " << k1 <<endl;
 		cout << "k2 = " << k2 <<endl;
 		cout << "MAX(E[tl_1])="<<Etl1max<<endl;
@@ -626,6 +628,26 @@ int main(int argc, char *argv[]) {
 		cout << "Sum of P =" << psimsum_game <<endl; 
 	}
 	
+	cout <<"Start writing output file"<<endl;
+	string content = "";
+	
+	int Ibest = findIndex(probAP,N_AP,MAX);
+	int Ibest_game = findIndex(probAP_game,N_AP,MAX);
+	double Pbest = probAP[Ibest];
+	double Pbest_game = probAP_game[Ibest_game];
+
+	// M, ,N, K, k1, k2, tl,tlgame, Pbest, Pbest with game
+	
+
+	content += to_string(N_AP)+ ","+to_string(N_selected)+","+to_string(K)+","+to_string((N_AP!=N_selected)?k1:0)+","
+			+to_string((N_AP!=N_selected)?k2:0) +","+to_string(Etl)+"," +to_string((N_AP!=N_selected)?Etlgame:0) +","
+			+ to_string(Pbest)+","+ to_string((N_AP!=N_selected)?Pbest_game:0); 
+
+
+	ofstream outfile;
+    outfile.open("output_best.txt",ios_base::app);
+    outfile << content <<"\n"; 
+    outfile.close();
 
 	/*
 	for(int i=0;i<N_AP;i++){
