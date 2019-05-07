@@ -1,0 +1,26 @@
+./bestWifiAP 10000 5 1 3 3 3 3 3 1 2 3 4 5 
+./bestWifiAP 10000 5 1 3 3 3 3 3 2 3 4 5 6 
+./bestWifiAP 10000 5 1 3 3 3 3 3 3 4 5 6 7 
+./bestWifiAP 10000 5 1 3 3 3 3 3 4 5 6 7 8 
+./bestWifiAP 10000 5 1 3 3 3 3 3 5 6 7 8 9 
+./bestWifiAP 10000 5 2 3 3 3 3 3 1 2 3 4 5 
+./bestWifiAP 10000 5 2 3 3 3 3 3 2 3 4 5 6 
+./bestWifiAP 10000 5 2 3 3 3 3 3 3 4 5 6 7 
+./bestWifiAP 10000 5 2 3 3 3 3 3 4 5 6 7 8 
+./bestWifiAP 10000 5 2 3 3 3 3 3 5 6 7 8 9 
+./bestWifiAP 10000 5 3 3 3 3 3 3 1 2 3 4 5 
+./bestWifiAP 10000 5 3 3 3 3 3 3 2 3 4 5 6 
+./bestWifiAP 10000 5 3 3 3 3 3 3 3 4 5 6 7 
+./bestWifiAP 10000 5 3 3 3 3 3 3 4 5 6 7 8 
+./bestWifiAP 10000 5 3 3 3 3 3 3 5 6 7 8 9 
+./bestWifiAP 10000 5 4 3 3 3 3 3 1 2 3 4 5 
+./bestWifiAP 10000 5 4 3 3 3 3 3 2 3 4 5 6 
+./bestWifiAP 10000 5 4 3 3 3 3 3 3 4 5 6 7 
+./bestWifiAP 10000 5 4 3 3 3 3 3 4 5 6 7 8 
+./bestWifiAP 10000 5 4 3 3 3 3 3 5 6 7 8 9 
+./bestWifiAP 10000 5 5 3 3 3 3 3 1 2 3 4 5 
+./bestWifiAP 10000 5 5 3 3 3 3 3 2 3 4 5 6 
+./bestWifiAP 10000 5 5 3 3 3 3 3 3 4 5 6 7 
+./bestWifiAP 10000 5 5 3 3 3 3 3 4 5 6 7 8 
+./bestWifiAP 10000 5 5 3 3 3 3 3 5 6 7 8 9 
+exec ./drawFigure

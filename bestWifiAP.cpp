@@ -386,7 +386,8 @@ int main(int argc, char *argv[]) {
 
 	int count [N_AP] = {0};
 	double probAP [N_AP]={0};
-	
+	double timerecord[N_AP]={0};
+	double ETi_k[N_AP]={0};
 	
 	double ti=0;
 	
@@ -404,7 +405,7 @@ int main(int argc, char *argv[]) {
 				ti+= es[i].generateRandomNumber();
 			}
 			t[i]=ti;
-		//	timerecord[x][i]=ti;
+			timerecord[i]=ti;
 			//cout << "t["<<i<<"]="<<t[i]<<"\n";
 		}
 		
@@ -421,6 +422,12 @@ int main(int argc, char *argv[]) {
 		cout << "count[" << i <<"]="<<count[i] <<"\n";
 		probAP[i] = (double)count[i]/(double)NSimulation;
 	}
+
+	for(int i=0;i<N_AP;i++){
+		ETi_k[i] = (double)(timerecord[i]/NSimulation);
+		cout << "E[T"<<i<<"_(K)]="<<ETi_k[i] <<"\n";
+	}
+
 	double psimsum=0;
 	for(int i=0;i<N_AP;i++){
 		cout <<"prob[AP"<<i<<"]=" <<fixed<<setprecision(8) <<probAP[i]<<"\n";
@@ -460,10 +467,10 @@ int main(int argc, char *argv[]) {
 
 		double pi = 3.14159265359;
 		stringstream prob1,mprob1;
-		prob1 << fixed << setprecision(15) << probAP[i];
-		mprob1 << fixed << setprecision(15) << Mprob[i];
+		prob1 << fixed << setprecision(4) << probAP[i];
+		mprob1 << fixed << setprecision(4) << Mprob[i];
 
-    	content+=","+prob1.str()+","+mprob1.str()+","+to_string(percent)+"%";
+    	content+=","+ to_string(ETi_k[i])+ ","+prob1.str()+","+mprob1.str()+","+to_string(percent)+"%";
 
 	}
     /* 

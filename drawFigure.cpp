@@ -204,7 +204,7 @@ int main(int argc, char *argv[]) {
         mathdata[0]= init;
         for(int i=1;i<df.getN_AP();i++){
             mathdata[i]=init +(i*4);
-            cout << mathdata[i]<<endl;
+           // cout << mathdata[i]<<endl;
         }
 
         int r=0;
@@ -243,9 +243,14 @@ int main(int argc, char *argv[]) {
         int x = selectMinIndex(dt);
         
         string content;
+
+        stringstream prob1,mprob1;
+		prob1 << fixed << setprecision(4) << dt[x].getSim_prob();
+		mprob1 << fixed << setprecision(4) << dt[x].getM_prob();
+
         content = to_string(dd.getN_sim()) +"," + to_string(dd.getN_AP()) + "," + to_string(dd.getK()) +"," \
                   + to_string(dt[x].getQ_AP()) +"," + to_string(dt[x].getMean())+","  + to_string(dt[x].getEti_k())+ "," \
-                 +to_string(dt[x].getSim_prob()) +","+ to_string(dt[x].getM_prob())+","+ dt[x].getError();
+                  + prob1.str() +","+ mprob1.str() +","+ dt[x].getError();
         i++;
         outfile << content <<"\n"; 
     }
