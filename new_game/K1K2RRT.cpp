@@ -463,6 +463,7 @@ int main(int argc, char *argv[]) {
 	double tl2min =0;
 	double ti=0;
 	double Etlgame  = 0;
+	double sum_selected = 0;
 	//int k2 =0;
 	//int k1 =0;
 	
@@ -471,11 +472,8 @@ int main(int argc, char *argv[]) {
 	// simulation part 
 	for(int x=0;x<NSimulation;x++)
 	{
-		//cout << x <<endl;
 		double t[N_AP]={0};
 		int minindex = -1;
-
-		// generate all ping value
 		for(int i=0;i<N_AP;i++){
 			ti=0;
 			for(int j=0;j<K;j++){
@@ -485,19 +483,23 @@ int main(int argc, char *argv[]) {
 			timerecord[i]=ti;
 			//cout << "t["<<i<<"]="<<t[i]<<"\n";
 		}
+		
 		//string stat;
 		minindex = findIndex(t,N_AP,MIN); // the best AP
-		//cout << "tl = MIN(T("<< minindex << ")_K) = " << t[minindex] <<endl;
 		count[minindex]+=1; 
 		tlmin += t[minindex];
-		//statfile << stat <<"\n";
-		if(N_AP!=N_selected)
-		{
-			// game 1
-			//cout << "========= Game 1 ========="<<endl;
-			// k1 = ceil(K/2);
-			//cout << "k1 =" <<k1 <<endl;
-			double tl[N_AP] = {0};
+	}
+
+	// threshold for selecting N APs
+	double Etl = tlmin/(double)NSimulation;
+	//cout << "E[tl]="<<Etl <<endl;
+	int selection = 0;
+
+	for(int x=0;x<NSimulation;x++)
+	{
+		// game 1
+		//cout << "========= Game 1 ========="<<endl;
+		double tl[N_AP] = {0};
 			double sum_ti = 0;
 			for(int i=0;i<N_AP;i++)
 			{
@@ -508,13 +510,14 @@ int main(int argc, char *argv[]) {
 				}
 				tl[i] = t1;
 				sum_ti +=t1;
-				
+		
 				//cout  << "T_"<<i<<"(1) = " << tl[i]<<endl;
 				//cout << "tl1 =MAX(T_("<<indexMax <<")_K)="<< tl[indexMax] <<endl;
 				//double threshold = computePercentile(tl,N_AP,25);
 				//cout << "Threshold = " << threshold <<endl; 
 			}
 
+			/*
 			map<double,int> mm;
 			double sortList[N_AP] = {0};
 			for(int i=0;i<N_AP;i++)
@@ -530,53 +533,82 @@ int main(int argc, char *argv[]) {
 			{
 				topSelected[i]=sortList[i];
 			}
+			*/
 
-			/*vector<int> ins;
+			vector<int> ins;
 			vector<double> tn;
 			for(int i=0;i<N_AP;i++)
 			{
-				if(tl[i]<=threshold)
+				if(tl[i]<=Etl)
 				{
 					//cout << "Select AP"<<i<<endl;
-					ins.push_back(i);
-					tn.push_back(tl[i]);
+					ins.push_back(i); // put id of AP
+					tn.push_back(tl[i]); // put tl of AP
 				}	
 			}
-			double tns[tn.size()]={0};
+ 
+			selection = tn.size();
+			//cout << "N_selected =" <<selection<<endl;
+			sum_selected+=selection;
 
-			for(int i=0;i<tn.size();i++){
-				tns[i]= tn[i];
-			}*/
-
-			int indexMax = findIndex(topSelected,N_selected,MAX);
-			//tl1max += tl[ins[indexMax]];
-			//cout << "select MAX = " <<  mm[topSelected[indexMax]] <<endl;
-			//cout << "tlMAX= " << tl[mm[topSelected[indexMax]]]<<endl;  
-			tl1max += tl[mm[topSelected[indexMax]]];
-			//cout << "Select candidate |N| = "<< ins.size() <<endl; 
-
-			//game 2
-			//cout << "========= Game 2 =========" << endl; 
-
-			// k2 = ceil(K*0.8);
-			//cout << "k2 =" <<k2 <<endl;
-			double tl2[N_selected] = {0};
-			for(int i=0;i<N_selected;i++)
-			{
-				double t2 =0;
-				for(int j=0;j<k2;j++)
+			switch(selection){
+				case 0 :
 				{
-					t2+=es[mm[topSelected[i]]].generateRandomNumber();
+					int inmin = findIndex(tl,N_AP,MIN);
+					tl1max += tl[inmin];
+					tl2min += tl[inmin];
+					count_game[inmin]+=1;
+					//cout << "select min : AP_"<<inmin<<endl;
+					break;
 				}
-				tl2[i] = t2;
-				//cout  << "T_"<<mm[topSelected[i]]<<"(2) = " << tl2[i]<<endl;
-			}
-			int indexMin = findIndex(tl2,N_selected,MIN);
-			//cout << "index Min = " << indexMin <<endl;
-			//cout << "Finally Select "<< mm[topSelected[indexMin]]<<endl;
-			//cout << "tl2 =MIN(T_("<<ins[indexMin] <<")_K)="<< tl2[indexMin] <<endl;
-			tl2min+= tl2[indexMin];
-			count_game[mm[topSelected[indexMin]]]+=1;
+					
+				case 1 :
+				{
+					tl1max += tl[ins[0]];
+					tl2min += tl[ins[0]];
+					count_game[ins[0]]+=1;
+					break;
+				}
+
+				default :
+				{
+					double tns[selection]={0};
+					for(int i=0;i<selection;i++){
+						tns[i]= tn[i];
+					}
+
+					int indexMax = findIndex(tns,selection,MAX);
+
+					//int indexMax = findIndex(topSelected,N_selected,MAX);
+					tl1max += tl[ins[indexMax]];
+					//cout << "select MAX = " <<  mm[topSelected[indexMax]] <<endl;
+					//cout << "tlMAX= " << tl[mm[topSelected[indexMax]]]<<endl;  
+					//tl1max += tl[mm[topSelected[indexMax]]];
+
+					//game 2
+					//cout << "========= Game 2 =========" << endl; 
+
+					double tl2[selection] = {0};
+					for(int i=0;i<selection;i++)
+					{
+						double t2 =0;
+						for(int j=0;j<k2;j++)
+						{
+							t2+=es[ins[i]].generateRandomNumber();
+						}
+						tl2[i] = t2;
+						//cout  << "T_"<<ins[i]<<"(2) = " << tl2[i]<<endl;
+					}
+					int indexMin = findIndex(tl2,selection,MIN);
+					//cout << "index Min = " << indexMin <<endl;
+					//cout << "Finally Select "<< mm[topSelected[indexMin]]<<endl;
+					//cout << "tl2 =MIN(T_("<<ins[indexMin] <<")_K)="<< tl2[indexMin] <<endl;
+					tl2min+= tl2[indexMin];
+					count_game[ins[indexMin]]+=1;
+
+					break;
+				}
+
 			}
 
 	}
@@ -590,7 +622,6 @@ int main(int argc, char *argv[]) {
 		probAP[i] = (double)count[i]/(double)NSimulation;
 	}
 
-	double Etl = tlmin/(double)NSimulation;
 	cout << "E[tl]="<<Etl<<endl;
 
 	double psimsum=0;
@@ -600,33 +631,36 @@ int main(int argc, char *argv[]) {
 	}
 	cout << "Sum of P =" << psimsum <<endl; 
 
-	if(N_AP!=N_selected)
+	cout << "========== with game =========="<<endl;
+	for(int i=0;i<N_AP;i++)
 	{
-		cout << "========== with game =========="<<endl;
-		for(int i=0;i<N_AP;i++)
-		{
-			//double p=0;
-			cout << "count_game[" << i <<"]="<<count_game[i] <<"\n";
-			probAP_game[i] = (double)count_game[i]/(double)NSimulation;
-		}
-
-		double Etl1max = tl1max/double(NSimulation);
-		double Etl2min = tl2min/double(NSimulation);
-		Etlgame = Etl1max + Etl2min; 
-		cout << "k1 = " << k1 <<endl;
-		cout << "k2 = " << k2 <<endl;
-		cout << "MAX(E[tl_1])="<<Etl1max<<endl;
-		cout << "MIN(E[tl_2])="<<Etl2min<<endl;
-		cout << "E[tl])="<<(Etl1max+Etl2min)<<endl;
-
-		double psimsum_game=0;
-		for(int i=0;i<N_AP;i++)
-		{
-			cout <<"prob_game[AP"<<i<<"]=" <<fixed<<setprecision(8) <<probAP_game[i]<<"\n";
-			psimsum_game += probAP_game[i];
-		}
-		cout << "Sum of P =" << psimsum_game <<endl; 
+		//double p=0;
+		cout << "count_game[" << i <<"]="<<count_game[i] <<"\n";
+		probAP_game[i] = (double)count_game[i]/(double)NSimulation;
 	}
+
+	double Etl1max = tl1max/double(NSimulation);
+	double Etl2min = tl2min/double(NSimulation);
+	Etlgame = Etl1max + Etl2min; 
+	cout << "k1 = " << k1 <<endl;
+	cout << "k2 = " << k2 <<endl;
+
+	double psimsum_game=0;
+	for(int i=0;i<N_AP;i++)
+	{
+		cout <<"prob_game[AP"<<i<<"]=" <<fixed<<setprecision(8) <<probAP_game[i]<<"\n";
+		psimsum_game += probAP_game[i];
+	}
+
+	double en = ((double)sum_selected/(double)NSimulation);
+
+	cout << "MAX(E[tl_1])="<<Etl1max<<endl;
+	cout << "MIN(E[tl_2])="<<Etl2min<<endl;
+	cout << "E[tl]="<<(Etl1max+Etl2min)<<endl;
+	cout << "E[N]="<<en<<endl;
+	cout << "Sum of P =" << psimsum_game <<endl; 
+
+	
 	
 	cout <<"Start writing output file"<<endl;
 	string content = "";
@@ -636,13 +670,16 @@ int main(int argc, char *argv[]) {
 	double Pbest = probAP[Ibest];
 	double Pbest_game = probAP_game[Ibest_game];
 
-	// M, ,N, K, k1, k2, tl,tlgame, Pbest, Pbest with game
+	// M, ,E[N], K, k1, k2, tl,tlgame, Pbest, Pbest with game
 	
 
-	content += to_string(N_AP)+ ","+to_string(N_selected)+","+to_string(K)+","+to_string((N_AP!=N_selected)?k1:0)+","
+	/*content += to_string(N_AP)+ ","+to_string(N_selected)+","+to_string(K)+","+to_string((N_AP!=N_selected)?k1:0)+","
 			+to_string((N_AP!=N_selected)?k2:0) +","+to_string(Etl)+"," +to_string((N_AP!=N_selected)?Etlgame:0) +","
-			+ to_string(Pbest)+","+ to_string((N_AP!=N_selected)?Pbest_game:0); 
+			+ to_string(Pbest)+","+ to_string((N_AP!=N_selected)?Pbest_game:0);*/ 
 
+	content += to_string(N_AP)+ ","+to_string(en)+","+to_string(K)+","+to_string(k1)+","
+			+to_string(k2) +","+to_string(Etl)+"," +to_string(Etlgame) +","
+			+ to_string(Pbest)+","+ to_string(Pbest_game); 
 
 	ofstream outfile;
     outfile.open("output_best.txt",ios_base::app);
