@@ -388,7 +388,8 @@ int main(int argc, char *argv[]) {
 	double probAP [N_AP]={0};
 	double timerecord[N_AP]={0};
 	double ETi_k[N_AP]={0};
-	
+	double sum_tl = 0;
+	double etl = 0;
 	double ti=0;
 	
 	cout << "================ Simulation ================\n";
@@ -413,6 +414,7 @@ int main(int argc, char *argv[]) {
 		minindex = findMinIndex(t,N_AP); // the best AP
 
 		count[minindex]+=1; 
+		sum_tl+=t[minindex];
 		//statfile << stat <<"\n"; 
 	}
 
@@ -428,14 +430,19 @@ int main(int argc, char *argv[]) {
 		cout << "E[T"<<i<<"_(K)]="<<ETi_k[i] <<"\n";
 	}
 
+	etl = (double)sum_tl/(double)NSimulation; 
+	cout << "E[tl]="<<etl<<endl;
+
 	double psimsum=0;
 	for(int i=0;i<N_AP;i++){
 		cout <<"prob[AP"<<i<<"]=" <<fixed<<setprecision(8) <<probAP[i]<<"\n";
 		psimsum += probAP[i];
 	}
 	cout << "Sum of P =" << psimsum <<endl;
+	
+	 
 	cout << "================ Math Anaysis ================\n";
-
+	
 	double Mprob[N_AP]={0};
 	double p2 = 0,psum =0;
     for(int i=0;i<N_AP;i++){
@@ -458,6 +465,8 @@ int main(int argc, char *argv[]) {
 	  for(int i=0;i<N_AP;i++){
 		content+=","+to_string(LAMDAs[i]); 
 	 }
+
+	
 	
     for(int i=0;i<N_AP;i++){
 
@@ -478,6 +487,8 @@ int main(int argc, char *argv[]) {
     	content+=","+to_string(Mprob[i]);
 	}*/
     
+	content +=","+ to_string(etl);
+
 	ofstream outfile;
     outfile.open("result.txt",ios_base::app);
     outfile << content <<"\n"; 

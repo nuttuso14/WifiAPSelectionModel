@@ -35,6 +35,8 @@ class WifiData{
     void setError(string n){
         error = n;
     }
+    
+
 
     int getQ_AP(){
         return q_ap;
@@ -57,6 +59,7 @@ class WifiData{
      double getMean(){
         return (double)(n_shape/lambda);
     }
+
     string getError(){
         return error;
     }
@@ -66,6 +69,7 @@ class WifiData{
 class DataFigure{
 
     int n_sim,n_ap,k;
+    double etl;
     vector<WifiData> wifi;
     public:
     void setN_sim(int n)
@@ -80,6 +84,10 @@ class DataFigure{
     {
         k = n;
     }
+    void setETL(double n){
+        etl = n;
+    }
+
     void setWifiData(vector<WifiData> wf){
         wifi = wf;
     }
@@ -96,6 +104,10 @@ class DataFigure{
     {
         return k;
     }
+    double getEtl(){
+        return etl;
+    }
+
     vector<WifiData> getWifiData(){
         return wifi;
     } 
@@ -197,6 +209,7 @@ int main(int argc, char *argv[]) {
         df.setN_sim(stoi(datum[0]));   
         df.setN_AP(stoi(datum[1]));
         df.setK(stoi(datum[2]));
+        df.setETL(stod(datum[datum.size()-1]));
 
         int mathdata[df.getN_AP()]={0};
         int init = 3+(df.getN_AP()*2);
@@ -221,6 +234,8 @@ int main(int argc, char *argv[]) {
             r++;
             wifis.push_back(wifi);
         }
+
+
         df.setWifiData(wifis);
         figs.push_back(df);
     }
@@ -250,7 +265,7 @@ int main(int argc, char *argv[]) {
 
         content = to_string(dd.getN_sim()) +"," + to_string(dd.getN_AP()) + "," + to_string(dd.getK()) +"," \
                   + to_string(dt[x].getQ_AP()) +"," + to_string(dt[x].getMean())+","  + to_string(dt[x].getEti_k())+ "," \
-                  + prob1.str() +","+ mprob1.str() +","+ dt[x].getError();
+                  + prob1.str() +","+ mprob1.str() +","+ dt[x].getError()+","+ to_string(dd.getEtl());
         i++;
         outfile << content <<"\n"; 
     }
